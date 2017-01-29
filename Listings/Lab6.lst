@@ -1,0 +1,168 @@
+A51 MACRO ASSEMBLER  LAB6                                                                 05/13/2016 14:59:40 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\Lab6.obj
+ASSEMBLER INVOKED BY: D:\Programs\Keil\C51\BIN\A51.EXE Lab6.a51 SET(SMALL) DEBUG PRINT(.\Listings\Lab6.lst) OBJECT(.\Obj
+                      ects\Lab6.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+  00A4                 1     FAN             BIT P2.4                        ;Set FAN                (P2.4)
+  00A5                 2     READ    BIT P2.5                        ;Set READ               (P2.5)
+  00A6                 3     WRITE   BIT P2.6                        ;Set WRITE              (P2.6)
+  00A7                 4     INTR    BIT P2.7                        ;Set INTR               (P2.7)
+  0080                 5     SW              EQU P0                          ;Set SW                 (P0)
+  0090                 6     LEDS    EQU P1                          ;Set LEDS               (P1)
+  00B0                 7     MDATA   EQU P3                          ;Set MDATA              (P3)
+                       8             
+  REG                  9     SETP    EQU R5
+  REG                 10     PV              EQU R6
+  REG                 11     ERROR   EQU R7
+                      12     
+                      13     
+  0001                14     FLAG EQU 1                                      ;Set ISR Flag
+                      15     
+0000                  16     ORG 0000H
+0000 020030           17             LJMP INITIAL                    ;Long Jump INITIAL
+                      18             
+000B                  19     ORG 000BH
+000B 020068           20             LJMP TIMER0_ISR                 ;Long Jump TIMER0_ISR
+                      21             
+0030                  22     ORG 0030H
+                      23             ;Initialization (Do this once)
+0030                  24             INITIAL:
+                      25                     ;Set ISR
+0030 75B0FF           26                     MOV      MDATA, #0FFH   ;Initialize P3 to 255
+0033 7580FF           27                     MOV  SW,        #0FFH   ;Initialize P0 to 255
+0036 759000           28                     MOV  LEDS,  #00H        ;Initialize P1 to 0
+0039 D2A7             29                     SETB INTR                       ;Set INTR
+003B 758901           30                     MOV  TMOD,      #01H    ;Enable Timer Mode 1
+003E 75A882           31                     MOV  IE,        #82H    ;Set Interrupt Enable
+0041 758A00           32                     MOV  TL0,       #00H    ;Set Timer LOW to 0
+0044 758CFF           33                     MOV  TH0,       #0FFH   ;Set Timer HIGH to 255
+0047 D28C             34                     SETB TR0                        ;Timer On
+                      35             
+                      36             ;Execute MAIN forever
+                      37             ;Switches will be read into LEDs and PV for the PID control
+                      38             ;SETP and PV will be divided by 2, subtracted, and the difference 
+                      39             ;will be added by 127 and put into ERROR. This allows for the
+                      40             ;fan to constantly adjust itself and stabilize, creating an
+                      41             ;oscillating effect until it reaches the final value.
+0049                  42             MAIN :
+0049 D2A6             43                     SETB WRITE                      ;Turn on WRITE
+004B 20A7FB           44                     JB   INTR,  MAIN        ;Loop if INTR is set
+004E C2A5             45                     CLR  READ                       ;Turn off READ
+0050 E5B0             46                     MOV  A,         MDATA   ;Read P0
+0052 F4               47                     CPL  A                          ;Complement A
+0053 F590             48                     MOV  LEDS,  A           ;LEDS take A
+0055 FE               49                     MOV  PV,        A               ;Processing Value takes A
+0056 D2A5             50                     SETB READ                       ;Turn on READ
+                      51                     
+                      52                     ;SJMP MAIN                      ;Loop MAIN
+                      53                     
+                      54                     ;PID CONTROL (SW - MDATA = ERROR)
+                      55                     ;SW / 2 & MDATA / 2 ;Divide 2 by rotating right (clear carry)
+                      56                     ;SETP - PV      
+                      57                     
+A51 MACRO ASSEMBLER  LAB6                                                                 05/13/2016 14:59:40 PAGE     2
+
+                      58                     ;SW / 2 -> Switches
+0058 E580             59                     MOV A,          SW              ;Move SW value into A (switches)
+005A 13               60                     RRC     A                               ;Rotate right
+005B C3               61                     CLR C                           ;Clear carry (shift right now)
+005C FD               62                     MOV SETP,       A               ;Store into setpoint
+                      63                     
+                      64                     ;PV / 2 -> MDATA
+005D EE               65                     MOV A,          PV              ;Move MDATA value into A (sensor)
+005E 13               66                     RRC     A                               ;Rotate right
+005F C3               67                     CLR C                           ;Clear carry (shift right now)
+0060 FE               68                     MOV PV,         A               ;Store into PV
+                      69                     
+                      70                     ;SETP - PV
+0061 ED               71                     MOV  A,         SETP    ;A takes SETP
+0062 9E               72                     SUBB A,         PV              ;A - PV (A = SETP - PV)
+                      73                     
+                      74                     ;Add 127 to A (ERROR = A - 127)
+0063 247F             75                     ADD A,          #127    ;A + 127
+0065 FF               76                     MOV ERROR,  A           ;ERROR takes A
+                      77                     
+0066 80E1             78                     SJMP MAIN                       ;Loop MAIN
+                      79             
+                      80             ;Utilize if-else statement in TIMER0_ISR
+0068                  81             TIMER0_ISR:
+                      82                     ;MOV  R1,    A          ;Save Accumulator into temp register R1
+0068 C28C             83                     CLR  TR0                        ;Turn off timer
+006A 758CFF           84                     MOV  TH0,       #0FFH   ;Set Timer high to FF
+006D 20010B           85                     JB   FLAG,      F_HIGH  ;If FLAG is set to high jump to F_HIGH (IF)
+                      86                                                             ;Otherwise run through F_LOW       
+                                     (ELSE)
+                      87             
+                      88             ;ELSE
+0070                  89             F_LOW:  
+0070 D201             90                     SETB FLAG                       ;Set FLAG to 1
+0072 C2A4             91                     CLR  FAN                        ;Clear FAN (P2.0) to LOW
+0074 8F8A             92                     MOV  TL0,       ERROR   ;Timer low takes current value of ERROR
+0076 758CFF           93                     MOV  TH0,       #0FFH   ;Set timer high to FF
+                      94     
+0079 800F             95                     SJMP START_PWM          ;Start PWM
+                      96             
+                      97             ;IF
+007B                  98             F_HIGH:
+007B C201             99                     CLR  FLAG                       ;Set FLAG to 0
+007D D2A4            100                     SETB FAN                        ;Set FAN (P2.0) to HIGH
+007F 74FF            101                     MOV  A,         #0FFH   ;Set A to FF (255)
+                     102                     
+0081 9F              103                     SUBB A,         ERROR   ;A = 255 - ERROR
+0082 F58A            104                     MOV  TL0,       A               ;Timer low takes whatever A is
+0084 758CFF          105                     MOV  TH0,   #0FFH       ;Set timer high to FF
+0087 C2A6            106                     CLR  WRITE                      ;Turn off WRITE
+0089 00              107                     NOP
+                     108                     
+008A                 109             START_PWM:
+008A D28C            110                     SETB TR0                        ;Turn on timer
+                     111                     ;MOV  A,                R1              ;Restore Accumulator of what R1 was
+                             .
+008C 32              112                     RETI                            ;Return
+                     113                     
+                     114     END
+A51 MACRO ASSEMBLER  LAB6                                                                 05/13/2016 14:59:40 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ERROR. . . . . . .    REG    R7          
+FAN. . . . . . . .  B ADDR   00A0H.4 A   
+FLAG . . . . . . .  N NUMB   0001H   A   
+F_HIGH . . . . . .  C ADDR   007BH   A   
+F_LOW. . . . . . .  C ADDR   0070H   A   
+IE . . . . . . . .  D ADDR   00A8H   A   
+INITIAL. . . . . .  C ADDR   0030H   A   
+INTR . . . . . . .  B ADDR   00A0H.7 A   
+LEDS . . . . . . .  D ADDR   0090H   A   
+MAIN . . . . . . .  C ADDR   0049H   A   
+MDATA. . . . . . .  D ADDR   00B0H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+PV . . . . . . . .    REG    R6          
+READ . . . . . . .  B ADDR   00A0H.5 A   
+SETP . . . . . . .    REG    R5          
+START_PWM. . . . .  C ADDR   008AH   A   
+SW . . . . . . . .  D ADDR   0080H   A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TIMER0_ISR . . . .  C ADDR   0068H   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+WRITE. . . . . . .  B ADDR   00A0H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

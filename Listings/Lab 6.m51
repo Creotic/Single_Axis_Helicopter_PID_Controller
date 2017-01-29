@@ -1,0 +1,115 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/13/2016  14:59:40  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\PROGRAMS\KEIL\C51\BIN\BL51.EXE .\Objects\Lab6.obj TO .\Objects\Lab 6 PRINT (.\Listings\Lab 6.m51) RAMSIZE (256)
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\Lab6.obj (LAB6)
+
+
+LINK MAP OF MODULE:  .\Objects\Lab 6 (LAB6)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     008DH     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Lab 6 (LAB6)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB6
+  B:00A0H.4       SYMBOL        FAN
+  N:0001H         SYMBOL        FLAG
+  C:007BH         SYMBOL        F_HIGH
+  C:0070H         SYMBOL        F_LOW
+  D:00A8H         SYMBOL        IE
+  C:0030H         SYMBOL        INITIAL
+  B:00A0H.7       SYMBOL        INTR
+  D:0090H         SYMBOL        LEDS
+  C:0049H         SYMBOL        MAIN
+  D:00B0H         SYMBOL        MDATA
+  D:0080H         SYMBOL        P0
+  D:0090H         SYMBOL        P1
+  D:00A0H         SYMBOL        P2
+  D:00B0H         SYMBOL        P3
+  B:00A0H.5       SYMBOL        READ
+  C:008AH         SYMBOL        START_PWM
+  D:0080H         SYMBOL        SW
+  D:008CH         SYMBOL        TH0
+  C:0068H         SYMBOL        TIMER0_ISR
+  D:008AH         SYMBOL        TL0
+  D:0089H         SYMBOL        TMOD
+  B:0088H.4       SYMBOL        TR0
+  B:00A0H.6       SYMBOL        WRITE
+  C:0000H         LINE#         17
+  C:000BH         LINE#         20
+  C:0030H         LINE#         26
+  C:0033H         LINE#         27
+  C:0036H         LINE#         28
+  C:0039H         LINE#         29
+  C:003BH         LINE#         30
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/13/2016  14:59:40  PAGE 2
+
+
+  C:003EH         LINE#         31
+  C:0041H         LINE#         32
+  C:0044H         LINE#         33
+  C:0047H         LINE#         34
+  C:0049H         LINE#         43
+  C:004BH         LINE#         44
+  C:004EH         LINE#         45
+  C:0050H         LINE#         46
+  C:0052H         LINE#         47
+  C:0053H         LINE#         48
+  C:0055H         LINE#         49
+  C:0056H         LINE#         50
+  C:0058H         LINE#         59
+  C:005AH         LINE#         60
+  C:005BH         LINE#         61
+  C:005CH         LINE#         62
+  C:005DH         LINE#         65
+  C:005EH         LINE#         66
+  C:005FH         LINE#         67
+  C:0060H         LINE#         68
+  C:0061H         LINE#         71
+  C:0062H         LINE#         72
+  C:0063H         LINE#         75
+  C:0065H         LINE#         76
+  C:0066H         LINE#         78
+  C:0068H         LINE#         83
+  C:006AH         LINE#         84
+  C:006DH         LINE#         85
+  C:0070H         LINE#         90
+  C:0072H         LINE#         91
+  C:0074H         LINE#         92
+  C:0076H         LINE#         93
+  C:0079H         LINE#         95
+  C:007BH         LINE#         99
+  C:007DH         LINE#         100
+  C:007FH         LINE#         101
+  C:0081H         LINE#         103
+  C:0082H         LINE#         104
+  C:0084H         LINE#         105
+  C:0087H         LINE#         106
+  C:0089H         LINE#         107
+  C:008AH         LINE#         110
+  C:008CH         LINE#         112
+  -------         ENDMOD        LAB6
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0063H BYTE ( 4%) *
+******************************************************************************
+
+Program Size: data=8.0 xdata=0 code=141
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
